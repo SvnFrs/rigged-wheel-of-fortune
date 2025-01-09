@@ -5,6 +5,10 @@ import { Play } from 'lucide-react';
 const CircularWheel = () => {
     const [items] = useState([
         { name: 'Free', probability: 10, color: '#FF6B6B' },
+        { name: 'No', probability: 20, color: '#4ECDC4' },
+        { name: 'Free', probability: 10, color: '#FF6B6B' },
+        { name: 'No', probability: 20, color: '#4ECDC4' },
+        { name: 'Free', probability: 10, color: '#FF6B6B' },
         { name: 'No', probability: 20, color: '#4ECDC4' }
     ]);
 
@@ -13,43 +17,31 @@ const CircularWheel = () => {
     const [winner, setWinner] = useState<string | null>(null);
     const wheelRef = useRef(null);
 
-    const normalizeProbabilities = () => {
-        const total = items.reduce((sum, item) => sum + item.probability, 0);
-        return items.map(item => ({
-            ...item,
-            probability: (item.probability / total) * 100
-        }));
-    };
-
     const spinWheel = () => {
         if (isSpinning) return;
 
         setIsSpinning(true);
         setWinner(null);
 
-        const normalizedItems = normalizeProbabilities();
-        const random = Math.random() * 100;
-        let cumulativeProbability = 0;
-        let selectedIndex = 0;
+        // Generate random number of complete rotations (between 5 and 10)
+        const numRotations = 10;
 
-        for (let i = 0; i < normalizedItems.length; i++) {
-            cumulativeProbability += normalizedItems[i].probability;
-            if (random <= cumulativeProbability) {
-                selectedIndex = i;
-                break;
-            }
-        }
+        // Calculate the final stopping position
+        const segmentSize = 360 / items.length;
+        const randomSegment = Math.floor(Math.random() * items.length);
+        const randomOffset = Math.random() * segmentSize; // Random position within segment
 
-        const extraSpins = 5;
-        const baseRotation = 360 * extraSpins;
-        const itemRotation = (360 / items.length) * selectedIndex;
-        const finalRotation = baseRotation + itemRotation;
+        // Calculate total rotation (complete rotations + segment position)
+        const finalRotation = (numRotations * 360) + (randomSegment * segmentSize) + randomOffset;
 
-        setRotation(rotation + finalRotation);
+        // Calculate which segment will be at the top when wheel stops
+        const winningIndex = items.length - Math.floor(((finalRotation % 360) / segmentSize)) - 1;
+
+        setRotation(finalRotation);
 
         setTimeout(() => {
             setIsSpinning(false);
-            setWinner(items[selectedIndex].name);
+            setWinner(items[winningIndex].name);
         }, 5000);
     };
 
@@ -62,7 +54,6 @@ const CircularWheel = () => {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="flex flex-col gap-8">
-                {/* Wheel Section */}
                 <div className="flex-1 relative">
                     <div className="relative w-96 h-96 mx-auto">
                         {/* Triangle Pointer */}
@@ -95,11 +86,10 @@ const CircularWheel = () => {
                                         'L 0 0'
                                     ].join(' ');
 
-                                    // Calculate text rotation and position
                                     const midPercent = (startPercent + endPercent) / 2;
                                     const [textX, textY] = getCoordinatesForPercent(midPercent);
                                     const textAngle = (midPercent * 360) + 90;
-                                    const textDistance = 0.65;  // Distance from center (0-1)
+                                    const textDistance = 0.65;
 
                                     return (
                                         <g key={i}>
@@ -129,15 +119,13 @@ const CircularWheel = () => {
                             onClick={spinWheel}
                             disabled={isSpinning}
                             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                        bg-blue-500 hover:bg-blue-600 text-white rounded-full p-6 shadow-lg 
-                        disabled:opacity-50 z-20"
+                                bg-blue-500 hover:bg-blue-600 text-white rounded-full p-6 shadow-lg 
+                                disabled:opacity-50 z-20"
                         >
                             <Play size={32} />
                         </button>
                     </div>
                 </div>
-
-                {/* Controls Section */}
 
                 {winner && (
                     <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-lg">
