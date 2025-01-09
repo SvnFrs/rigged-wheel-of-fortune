@@ -1,14 +1,13 @@
 'use client';
 import React, { useState, useRef } from 'react';
-import { Play } from 'lucide-react';
 import './circle.css';
-
+import Image from 'next/image';
 const CircularWheel = () => {
     const [items] = useState([
-        { index: 1, name: '3 phần trứng', probability: 10, color: '#FF6B6B' },
-        { index: 2, name: '1 phần Trứng', probability: 20, color: '#4ECDC4' },
-        { index: 3, name: '1 trái cây dầm', probability: 10, color: '#FF6B6B' },
-        { index: 4, name: '1 trái cây lắc', probability: 20, color: '#4ECDC4' },
+        { index: 1, name: '3 phần trứng', probability: 10, color: '#b85eac' },
+        { index: 2, name: '1 phần Trứng', probability: 20, color: '#6b5c41' },
+        { index: 3, name: '1 trái cây dầm', probability: 10, color: '#FFD93D' },
+        { index: 4, name: '1 trái cây lắc', probability: 20, color: '#6A0572' },
         { index: 5, name: 'Nothing', probability: 10, color: '#FF6B6B' },
         { index: 6, name: 'Combo 3 món free', probability: 20, color: '#4ECDC4' }
     ]);
@@ -124,10 +123,10 @@ const CircularWheel = () => {
                             onClick={spinWheel}
                             disabled={isSpinning}
                             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                                bg-blue-500 hover:bg-blue-600 text-white rounded-full p-6 shadow-lg 
+                                bg-blue-500 hover:bg-blue-600 text-white rounded-full  shadow-lg 
                                 disabled:opacity-50 z-20"
                         >
-                            <Play size={32} />
+                            <Image src="/mascot.png" width={50} height={50} alt="Spin the wheel" />
                         </button>
                     </div>
                 </div>
