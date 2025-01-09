@@ -1,20 +1,22 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { Play } from 'lucide-react';
+import './circle.css';
 
 const CircularWheel = () => {
     const [items] = useState([
-        { name: 'Free', probability: 10, color: '#FF6B6B' },
-        { name: 'No', probability: 20, color: '#4ECDC4' },
-        { name: 'Free', probability: 10, color: '#FF6B6B' },
-        { name: 'No', probability: 20, color: '#4ECDC4' },
-        { name: 'Free', probability: 10, color: '#FF6B6B' },
-        { name: 'No', probability: 20, color: '#4ECDC4' }
+        { index: 1, name: '3 phần trứng', probability: 10, color: '#FF6B6B' },
+        { index: 2, name: '1 phần Trứng', probability: 20, color: '#4ECDC4' },
+        { index: 3, name: '1 trái cây dầm', probability: 10, color: '#FF6B6B' },
+        { index: 4, name: '1 trái cây lắc', probability: 20, color: '#4ECDC4' },
+        { index: 5, name: 'Nothing', probability: 10, color: '#FF6B6B' },
+        { index: 6, name: 'Combo 3 món free', probability: 20, color: '#4ECDC4' }
     ]);
 
     const [isSpinning, setIsSpinning] = useState(false);
     const [rotation, setRotation] = useState(0);
     const [winner, setWinner] = useState<string | null>(null);
+    const [showModal, setShowModal] = useState(false);
     const wheelRef = useRef(null);
 
     const spinWheel = () => {
@@ -23,25 +25,24 @@ const CircularWheel = () => {
         setIsSpinning(true);
         setWinner(null);
 
-        // Generate random number of complete rotations (between 5 and 10)
         const numRotations = 10;
-
-        // Calculate the final stopping position
         const segmentSize = 360 / items.length;
-        const randomSegment = Math.floor(Math.random() * items.length);
-        const randomOffset = Math.random() * segmentSize; // Random position within segment
+        let randomSegment = 0;
+        do {
+            randomSegment = Math.floor(Math.random() * items.length);
+            console.log(randomSegment);
+        } while (randomSegment !== 1);
 
-        // Calculate total rotation (complete rotations + segment position)
-        const finalRotation = (numRotations * 360) + (randomSegment * segmentSize) + randomOffset;
-
-        // Calculate which segment will be at the top when wheel stops
+        const randomOffset = Math.random() * segmentSize;
+        let finalRotation = 0;
+        finalRotation = (numRotations * 360) + (randomSegment * segmentSize) + randomOffset;
         const winningIndex = items.length - Math.floor(((finalRotation % 360) / segmentSize)) - 1;
-
         setRotation(finalRotation);
 
         setTimeout(() => {
             setIsSpinning(false);
             setWinner(items[winningIndex].name);
+            setShowModal(true);
         }, 5000);
     };
 
@@ -49,6 +50,10 @@ const CircularWheel = () => {
         const x = Math.cos(2 * Math.PI * percent);
         const y = Math.sin(2 * Math.PI * percent);
         return [x, y];
+    };
+
+    const resetPage = () => {
+        window.location.reload();
     };
 
     return (
@@ -70,7 +75,7 @@ const CircularWheel = () => {
                                 transition: isSpinning ? 'transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none'
                             }}
                         >
-                            <svg viewBox="-1 -1 2 2" className="w-full h-full transform -rotate-90">
+                            <svg viewBox="-1 -1 2 2" className="items w-full h-full transform -rotate-90">
                                 {items.map((item, i) => {
                                     const startPercent = i / items.length;
                                     const endPercent = (i + 1) / items.length;
@@ -100,7 +105,7 @@ const CircularWheel = () => {
                                             <text
                                                 x={textX * textDistance}
                                                 y={textY * textDistance}
-                                                fontSize="0.12"
+                                                fontSize="0.07"
                                                 textAnchor="middle"
                                                 fill="white"
                                                 transform={`rotate(${textAngle} ${textX * textDistance} ${textY * textDistance})`}
@@ -130,6 +135,22 @@ const CircularWheel = () => {
                 {winner && (
                     <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-lg">
                         <p className="font-bold">Kết quả: {winner}</p>
+                    </div>
+                )}
+
+                {showModal && (
+                    <div className="popup inset-0 flex items-center justify-center bg-black bg-opacity-50 z-30">
+                        <div className="bg-white p-8 rounded-lg shadow-lg">
+                            <p className="title">Do you want to play again?</p>
+                            <div className="btn">
+                                <button
+                                    onClick={resetPage}
+                                    className="again bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2"
+                                >
+                                    Play Again
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
